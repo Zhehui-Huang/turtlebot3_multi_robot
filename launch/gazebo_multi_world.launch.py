@@ -37,7 +37,6 @@ def generate_launch_description():
         name="enable_drive", default_value="true", description="Enable robot drive node"
     )
 
-
     turtlebot3_multi_robot = get_package_share_directory("turtlebot3_multi_robot")
     launch_file_dir = os.path.join(turtlebot3_multi_robot, "launch")
 
@@ -69,8 +68,8 @@ def generate_launch_description():
     ld.add_action(gzserver_cmd)
     ld.add_action(gzclient_cmd)
 
-    ROWS = 5
-    COLS = 5
+    ROWS = 3
+    COLS = 3
 
     x = -ROWS
     y = -COLS
@@ -105,7 +104,7 @@ def generate_launch_description():
                 executable="spawn_entity.py",
                 arguments=[
                     "-file",
-                    os.path.join(turtlebot3_multi_robot,'models', 'turtlebot3_' + TURTLEBOT3_MODEL, 'model.sdf'),
+                    os.path.join(turtlebot3_multi_robot, 'models', 'turtlebot3_' + TURTLEBOT3_MODEL, 'model.sdf'),
                     "-entity",
                     name,
                     "-robot_namespace",
@@ -130,7 +129,7 @@ def generate_launch_description():
                 # Call add_action directly for the first robot to facilitate chain instantiation via RegisterEventHandler
                 ld.add_action(turtlebot_state_publisher)
                 ld.add_action(spawn_turtlebot3_burger)
-                
+
             else:
                 # Use RegisterEventHandler to ensure next robot creation happens only after the previous one is completed.
                 # Simply calling ld.add_action for spawn_entity introduces issues due to parallel run.
@@ -155,8 +154,10 @@ def generate_launch_description():
             namespace = "/tb" + str(i) + "_" + str(j)
             # Create spawn call
             drive_turtlebot3_burger = Node(
-                package="turtlebot3_gazebo",
-                executable="turtlebot3_drive",
+                # package="turtlebot3_gazebo",
+                # executable="turtlebot3_drive",
+                package="my_robot_driver",
+                executable="my_drive_node",
                 namespace=namespace,
                 output="screen",
                 condition=IfCondition(enable_drive),
@@ -170,7 +171,7 @@ def generate_launch_description():
                     on_exit=[drive_turtlebot3_burger],
                 )
             )
-            
+
             ld.add_action(drive_turtlebot3_event)
 
     return ld
