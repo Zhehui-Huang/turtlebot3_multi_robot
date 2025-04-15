@@ -68,11 +68,12 @@ def generate_launch_description():
     ld.add_action(gzserver_cmd)
     ld.add_action(gzclient_cmd)
 
-    ROWS = 2
-    COLS = 2
+    ROWS = 3
+    COLS = 3
+    tmp_shift = 1.5
 
-    x = -ROWS
-    y = -COLS
+    x = 0
+    y = -3.0
     last_action = None
 
     # Remapping is required for state publisher otherwise /tf and /tf_static will get be published on root '/' namespace
@@ -80,7 +81,7 @@ def generate_launch_description():
 
     # Spawn turtlebot3 instances in gazebo
     for i in range(COLS):
-        x = -ROWS
+        x = -3.0
         for j in range(ROWS):
             # Construct a unique name and namespace
             name = "turtlebot" + str(i) + "_" + str(j)
@@ -123,7 +124,7 @@ def generate_launch_description():
             )
 
             # Advance by 2 meter in x direction for next robot instantiation
-            x += 2.0
+            x += tmp_shift
 
             if last_action is None:
                 # Call add_action directly for the first robot to facilitate chain instantiation via RegisterEventHandler
@@ -146,7 +147,7 @@ def generate_launch_description():
             last_action = spawn_turtlebot3_burger
 
         # Advance by 2 meter in y direction for next robot instantiation
-        y += 2.0
+        y += tmp_shift
 
     # Start all driving nodes after the last robot is spawned
     for i in range(COLS):
@@ -179,6 +180,10 @@ def generate_launch_description():
         package="global_pos_collect",
         executable="global_pos",
         output="screen",
+        parameters=[{
+            "num_rows": ROWS,
+            "num_cols": COLS
+        }]
     )
     ld.add_action(global_path_planner)
 
