@@ -68,8 +68,8 @@ def generate_launch_description():
     ld.add_action(gzserver_cmd)
     ld.add_action(gzclient_cmd)
 
-    ROWS = 3
-    COLS = 3
+    ROWS = 2
+    COLS = 1
     tmp_shift = 1.5
 
     x = 0
@@ -175,7 +175,7 @@ def generate_launch_description():
 
             ld.add_action(drive_turtlebot3_event)
 
-    # Add the global path planner node
+    # # Add the global path planner node
     global_path_planner = Node(
         package="global_pos_collect",
         executable="global_pos",
