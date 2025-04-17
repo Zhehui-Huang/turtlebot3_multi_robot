@@ -69,7 +69,7 @@ def generate_launch_description():
     ld.add_action(gzclient_cmd)
 
     ROWS = 2
-    COLS = 1
+    COLS = 2
     tmp_shift = 1.5
 
     x = 0
