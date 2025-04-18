@@ -47,9 +47,7 @@ def generate_launch_description():
     urdf_file_name = "turtlebot3_" + TURTLEBOT3_MODEL + ".urdf"
     print("urdf_file_name : {}".format(urdf_file_name))
 
-    urdf = os.path.join(
-        turtlebot3_multi_robot, "urdf", urdf_file_name
-    )
+    urdf = os.path.join(turtlebot3_multi_robot, "urdf", urdf_file_name)
 
     gzserver_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -70,19 +68,20 @@ def generate_launch_description():
 
     ROWS = 2
     COLS = 2
-    tmp_shift = 1.5
-
-    x = 0
-    y = -3.0
     last_action = None
+
+    robot_pos = [
+        [-2.0, -2.0], [0.0, -2.0],
+        [-2.0, 0.0], [0.0, 0.0]
+    ]
 
     # Remapping is required for state publisher otherwise /tf and /tf_static will get be published on root '/' namespace
     remappings = [("/tf", "tf"), ("/tf_static", "tf_static")]
 
     # Spawn turtlebot3 instances in gazebo
-    for i in range(COLS):
-        x = -3.0
-        for j in range(ROWS):
+    for i in range(ROWS):
+        for j in range(COLS):
+            x, y = robot_pos[i * COLS + j]
             # Construct a unique name and namespace
             name = "turtlebot" + str(i) + "_" + str(j)
             namespace = "/tb" + str(i) + "_" + str(j)
@@ -93,8 +92,7 @@ def generate_launch_description():
                 namespace=namespace,
                 executable="robot_state_publisher",
                 output="screen",
-                parameters=[{"use_sim_time": False,
-                             "publish_frequency": 10.0}],
+                parameters=[{"use_sim_time": False, "publish_frequency": 10.0}],
                 remappings=remappings,
                 arguments=[urdf],
             )
@@ -123,9 +121,6 @@ def generate_launch_description():
                 output="screen",
             )
 
-            # Advance by 2 meter in x direction for next robot instantiation
-            x += tmp_shift
-
             if last_action is None:
                 # Call add_action directly for the first robot to facilitate chain instantiation via RegisterEventHandler
                 ld.add_action(turtlebot_state_publisher)
@@ -146,12 +141,9 @@ def generate_launch_description():
             # Save last instance for next RegisterEventHandler
             last_action = spawn_turtlebot3_burger
 
-        # Advance by 2 meter in y direction for next robot instantiation
-        y += tmp_shift
-
     # Start all driving nodes after the last robot is spawned
-    for i in range(COLS):
-        for j in range(ROWS):
+    for i in range(ROWS):
+        for j in range(COLS):
             namespace = "/tb" + str(i) + "_" + str(j)
             # Create spawn call
             drive_turtlebot3_burger = Node(
